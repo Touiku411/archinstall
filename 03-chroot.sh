@@ -25,6 +25,7 @@ pacman -S --noconfirm "${PKGS_PACMAN[@]}"
 
 # swap
 swapoff /swapfile 2>/dev/null || true
+rm -f /swapfile
 fallocate -l 16G /swapfile
 chmod 600 /swapfile
 mkswap /swapfile

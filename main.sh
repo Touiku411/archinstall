@@ -54,3 +54,13 @@ if [[ "$REBOOT_LOWER" == "y" || "$REBOOT_LOWER" == "yes" || -z "$REBOOT_CONFIRM"
     reboot
 fi
 
+read -p "install hyprland? [Y/n]" CONFIRM
+COMFIRM="${CONFIRM,,}"
+if [[ "$REBOOT_LOWER" == "y" || "$REBOOT_LOWER" == "yes" || -z "$REBOOT_CONFIRM" ]]; then
+    git clone https://github.com/Touiku411/dotfiles
+    cd dotfiles
+    chmod +x setup.sh
+    ./setup.sh
+fi
+
+
