@@ -10,7 +10,7 @@ PKGS_PACMAN=(
     "networkmanager" "sudo" "pipewire" "wireplumber" "pipewire-pulse" 
     "nvtop" "vim" "firefox" "noto-fonts-cjk" "noto-fonts-emoji" 
     "git" "base-devel" "fcitx5-im" "fcitx5-chewing" "fcitx5-qt" 
-    "fcitx5-gtk" "fcitx5-chinese-addons" "nautilus" "kitty" "os-prober"
+    "fcitx5-gtk" "fcitx5-chinese-addons" "nautilus" "kitty" "os-prober" "pavucontrol" "fish"
 )
 if [[ "$HAS_NVIDIA" == "YES" ]]; then
     PKGS_PACMAN+=("nvidia-utils" "nvidia-open-dkms" "nvidia-settings")
