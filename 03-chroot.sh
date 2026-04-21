@@ -82,5 +82,16 @@ if [[ "$HAS_NVIDIA" == "YES" ]]; then
     grub-mkconfig -o /boot/grub/grub.cfg
 fi
 
+read -p "install hyprland dotfiles? [Y/n]" CONFIRM
+COMFIRM="${CONFIRM,,}"
+if [[ "$CONFIRM" == "y" || "$CONFIRM" == "yes" || -z "$CONFIRM" ]]; then
+    cd "/home/$USERNAME"
+    sudo -u "$USERNAME" bash <<EOF
+    git clone https://github.com/Touiku411/dotfiles "/home/$USERNAME/dotfiles"
+    cd dotfiles
+    chmod +x setup.sh
+    ./setup.sh
+EOF
+fi
 
 

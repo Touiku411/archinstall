@@ -18,5 +18,5 @@ pacman -Sy --noconfirm reflector
 # -a : age, -c : country, -f : fast, --v : verbose show process
 reflector -a 12 -c tw -f 10 --sort rate --v --save /etc/pacman.d/mirrorlist
 
-pacstrap -i /mnt base linux linux-firmware vim grub efibootmgr --coconfirm
+pacstrap -i /mnt base linux linux-firmware vim grub efibootmgr --noconfirm
 genfstab -U /mnt >> /mnt/etc/fstab

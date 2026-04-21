@@ -43,9 +43,9 @@ chmod +x /mnt/03-chroot.sh
 arch-chroot /mnt /03-chroot.sh "$USERNAME" "$HOSTNAME" "$HAS_NVIDIA" "$CPU_VENDOR"
 rm /mnt/03-chroot.sh
 
+
 swapoff /mnt/swapfile 2>/dev/null || true
 umount -R /mnt || umount -l -R /mnt
-
 
 read -p "install complete reboot now？ [Y/n]: " REBOOT_CONFIRM
 REBOOT_LOWER="${REBOOT_CONFIRM,,}"
@@ -54,13 +54,5 @@ if [[ "$REBOOT_LOWER" == "y" || "$REBOOT_LOWER" == "yes" || -z "$REBOOT_CONFIRM"
     reboot
 fi
 
-read -p "install hyprland? [Y/n]" CONFIRM
-COMFIRM="${CONFIRM,,}"
-if [[ "$REBOOT_LOWER" == "y" || "$REBOOT_LOWER" == "yes" || -z "$REBOOT_CONFIRM" ]]; then
-    git clone https://github.com/Touiku411/dotfiles
-    cd dotfiles
-    chmod +x setup.sh
-    ./setup.sh
-fi
 
 
