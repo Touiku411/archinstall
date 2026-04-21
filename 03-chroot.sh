@@ -10,7 +10,7 @@ PKGS_PACMAN=(
     "networkmanager" "sudo" "pipewire" "wireplumber" "pipewire-pulse" 
     "nvtop" "vim" "firefox" "noto-fonts-cjk" "noto-fonts-emoji" 
     "git" "base-devel" "fcitx5-im" "fcitx5-chewing" "fcitx5-qt" 
-    "fcitx5-gtk" "fcitx5-chinese-addons" "nautilus" "kitty"
+    "fcitx5-gtk" "fcitx5-chinese-addons" "nautilus" "kitty" "os-prober"
 )
 if [[ "$HAS_NVIDIA" == "YES" ]]; then
     PKGS_PACMAN+=("nvidia-utils" "nvidia-open-dkms" "nvidia-settings")
@@ -77,6 +77,7 @@ if [[ "$HAS_NVIDIA" == "YES" ]]; then
             sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="\(.*\)"/GRUB_CMDLINE_LINUX_DEFAULT="\1 acpi_backlight=native"/' /etc/default/grub
         fi
     fi
+    echo "GRUB_DISABLE_OS_PROBER=false" | sudo tee -a /etc/default/grub
     grub-mkconfig -o /boot/grub/grub.cfg
 fi
 
