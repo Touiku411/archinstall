@@ -36,7 +36,7 @@ ln -sf /usr/share/zoneinfo/Asia/Taipei /etc/localtime
 hwclock --systohc
 
 # echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
-cat<< EOF >> /etc/locale.gen
+tee -a /etc/locale.gen > /dev/null <<EOF
 en_US.UTF-8 UTF-8
 zh_TW.UTF-8 UTF-8
 EOF
@@ -45,13 +45,13 @@ locale-gen
 echo "LANG=en_US.UTF-8" > /etc/locale.conf
 echo "KEYMAP=us" > /etc/vconsole.conf
 echo "$HOSTNAME" > /etc/hostname
-cat << EOF >> /etc/hosts
+tee -a /etc/hosts > /dev/null <<EOF
 127.0.0.1 localhost
 ::1 localhost
 127.0.1.1 $HOSTNAME.localdomain $HOSTNAME
 EOF
 
-echo "PlEASE ENTER ROOT PASSWORD: "
+echo "PLEASE ENTER ROOT PASSWORD: "
 passwd
 useradd -m -g users -G wheel,audio,video,storage -s /bin/bash $USERNAME
 echo "PLEASE ENTER $USERNAME PASSWORD: "
@@ -78,21 +78,18 @@ if [[ "$HAS_NVIDIA" == "YES" ]]; then
             sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="\(.*\)"/GRUB_CMDLINE_LINUX_DEFAULT="\1 acpi_backlight=native"/' /etc/default/grub
         fi
     fi
-    echo "GRUB_DISABLE_OS_PROBER=false" | sudo tee -a /etc/default/grub
+    echo "GRUB_DISABLE_OS_PROBER=false" >> /etc/default/grub
     grub-mkconfig -o /boot/grub/grub.cfg
 fi
 
-read -p "install hyprland dotfiles & sddm ? [Y/n]" CONFIRM
-COMFIRM="${CONFIRM,,}"
+read -p "install hyprland dotfiles ? [Y/n]" CONFIRM
+CONFIRM="${CONFIRM,,}"
 if [[ "$CONFIRM" == "y" || "$CONFIRM" == "yes" || -z "$CONFIRM" ]]; then
     cd "/home/$USERNAME"
-    sudo -u "$USERNAME" bash <<EOF
-    git clone https://github.com/Touiku411/dotfiles "/home/$USERNAME/dotfiles"
-    cd dotfiles
-    chmod +x setup.sh
+    sudo -H -u "$USERNAME" bash <<'EOF'
+    git clone https://github.com/Touiku411/arch-hyprland.git "$HOME/arch-hyprland"
+    cd "$HOME/arch-hyprland" && chmod +x setup.sh
     ./setup.sh
-    cd sddm & chmod +x install.sh
-    ./install.sh
 EOF
 fi
 
