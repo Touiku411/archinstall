@@ -39,9 +39,11 @@ fi
 if [[ "$TARGET_DISK" == *"nvme"* || "$TARGET_DISK" == *"mmcblk"* ]]; then
     EFI_PART="${TARGET_DISK}p1"
     ROOT_PART="${TARGET_DISK}p2"
+    SWAP_PART="${TARGET_DISK}p3"
 else
     EFI_PART="${TARGET_DISK}1"
     ROOT_PART="${TARGET_DISK}2"
+    SWAP_PART="${TARGET_DISK}3"
 fi
 
 echo "---START PROCESSING THE DISK---"
@@ -50,5 +52,7 @@ echo "---BUILDING PARTITIONS---"
 parted -s "$TARGET_DISK" mklabel gpt
 parted -s "$TARGET_DISK" mkpart "EFI" fat32 1MiB 513MiB
 parted -s "$TARGET_DISK" set 1 esp on
-parted -s "$TARGET_DISK" mkpart "Root" ext4 513MiB 100%
+parted -s "$TARGET_DISK" mkpart "Root" ext4 513MiB -16GiB
+parted -s "$TARGET_DISK" mkpart "Swap" linux-swap -16GiB 100%
+
 

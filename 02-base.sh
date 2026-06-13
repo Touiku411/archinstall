@@ -5,6 +5,7 @@ echo "---FORMATING PARTITIONS---"
 
 mkfs.fat -F 32 "$EFI_PART"
 mkfs.ext4 -F "$ROOT_PART"
+mkswap "$SWAP_PART"
 
 echo ""
 echo "---MOUNTING PARTITIONS---"
@@ -12,6 +13,7 @@ echo "---MOUNTING PARTITIONS---"
 mount "$ROOT_PART" /mnt
 mkdir -p /mnt/boot/efi
 mount "$EFI_PART" /mnt/boot/efi
+swapon "$SWAP_PART"
 
 echo "---配置鏡像源---"
 pacman -Sy --noconfirm reflector

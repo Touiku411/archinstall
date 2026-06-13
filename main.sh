@@ -2,8 +2,8 @@
 #main
 set -e
 
-LOG_FILE="arch_install_$(date +%Y%m%d_%H%M%S).log"
-exec > >(tee -a "$LOG_FILE") 2>&1
+#LOG_FILE="arch_install_$(date +%Y%m%d_%H%M%S).log"
+#exec > >(tee -a "$LOG_FILE") 2>&1
 
 export USERNAME="touiku"
 export HOSTNAME="archlinux"
@@ -44,7 +44,7 @@ arch-chroot /mnt /03-chroot.sh "$USERNAME" "$HOSTNAME" "$HAS_NVIDIA" "$CPU_VENDO
 rm /mnt/03-chroot.sh
 
 
-swapoff /mnt/swapfile 2>/dev/null || true
+swapoff -a
 umount -R /mnt || umount -l -R /mnt
 
 read -p "install complete reboot now？ [Y/n]: " REBOOT_CONFIRM

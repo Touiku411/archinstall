@@ -23,14 +23,6 @@ fi
 pacman -Syu --noconfirm
 pacman -S --noconfirm "${PKGS_PACMAN[@]}" 
 
-# swap
-swapoff /swapfile 2>/dev/null || true
-rm -f /swapfile
-fallocate -l 16G /swapfile
-chmod 600 /swapfile
-mkswap /swapfile
-swapon /swapfile
-echo "/swapfile none swap defaults 0 0" >> /etc/fstab
 
 ln -sf /usr/share/zoneinfo/Asia/Taipei /etc/localtime
 hwclock --systohc
@@ -58,16 +50,31 @@ echo "PLEASE ENTER $USERNAME PASSWORD: "
 passwd $USERNAME
 echo "%wheel ALL=(ALL:ALL) ALL" >> /etc/sudoers
 
+#Hibernate
+echo "CONFIGURING HIBERNATE..."
+SWAP_UUID=$(blkid -s UUID -o value -t TYPE=swap)
+
+# 將 resume 參數寫入 GRUB (不需要 resume_offset 了！)
+if ! grep -q "resume=" /etc/default/grub; then
+    sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT=\"\(.*\)\"/GRUB_CMDLINE_LINUX_DEFAULT=\"\1 resume=UUID=${SWAP_UUID}\"/" /etc/default/grub
+fi
+
+# 在 mkinitcpio.conf 的 HOOKS 中加入 resume
+if ! grep -q "resume" /etc/mkinitcpio.conf; then
+    sed -i 's/\(^HOOKS=.*block\)/\1 resume/' /etc/mkinitcpio.conf
+fi
+
+
 # bootloader grub
 grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi
-grub-mkconfig -o /boot/grub/grub.cfg
+# grub-mkconfig -o /boot/grub/grub.cfg
 
 systemctl enable NetworkManager.service
 
 if [[ "$HAS_NVIDIA" == "YES" ]]; then
     sed -i 's/^MODULES=.*/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)/' /etc/mkinitcpio.conf
     pacman -S --noconfirm linux-headers
-    mkinitcpio -P
+    # mkinitcpio -P
     # \( .* \) .*表全部
     if ! grep -q "nvidia_drm.modeset=1" /etc/default/grub; then
         sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="\(.*\)"/GRUB_CMDLINE_LINUX_DEFAULT="\1 nvidia_drm.modeset=1"/' /etc/default/grub
@@ -79,8 +86,11 @@ if [[ "$HAS_NVIDIA" == "YES" ]]; then
         fi
     fi
     echo "GRUB_DISABLE_OS_PROBER=false" >> /etc/default/grub
-    grub-mkconfig -o /boot/grub/grub.cfg
+    # grub-mkconfig -o /boot/grub/grub.cfg
 fi
+
+mkinitcpio -P
+grub-mkconfig -o /boot/grub/grub.cfg
 
 read -p "install hyprland dotfiles ? [Y/n]" CONFIRM
 CONFIRM="${CONFIRM,,}"
