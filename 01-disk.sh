@@ -52,7 +52,7 @@ echo "---BUILDING PARTITIONS---"
 parted -s "$TARGET_DISK" mklabel gpt
 parted -s "$TARGET_DISK" mkpart "EFI" fat32 1MiB 513MiB
 parted -s "$TARGET_DISK" set 1 esp on
-parted -s "$TARGET_DISK" mkpart "Root" ext4 513MiB -16GiB
-parted -s "$TARGET_DISK" mkpart "Swap" linux-swap -16GiB 100%
+parted -s "$TARGET_DISK" -- mkpart "Root" ext4 513MiB -16GiB
+parted -s "$TARGET_DISK" -- mkpart "Swap" linux-swap -16GiB 100%
 
 
