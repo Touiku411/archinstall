@@ -38,12 +38,12 @@ fi
 
 if [[ "$TARGET_DISK" == *"nvme"* || "$TARGET_DISK" == *"mmcblk"* ]]; then
     EFI_PART="${TARGET_DISK}p1"
-    ROOT_PART="${TARGET_DISK}p2"
-    SWAP_PART="${TARGET_DISK}p3"
+    SWAP_PART="${TARGET_DISK}p2"
+    ROOT_PART="${TARGET_DISK}p3"
 else
     EFI_PART="${TARGET_DISK}1"
-    ROOT_PART="${TARGET_DISK}2"
-    SWAP_PART="${TARGET_DISK}3"
+    SWAP_PART="${TARGET_DISK}2"
+    ROOT_PART="${TARGET_DISK}3"
 fi
 
 echo "---START PROCESSING THE DISK---"
