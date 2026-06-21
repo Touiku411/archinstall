@@ -4,8 +4,8 @@ echo ""
 echo "---FORMATING PARTITIONS---"
 
 mkfs.fat -F 32 "$EFI_PART"
-mkfs.ext4 -F "$ROOT_PART"
-mkswap "$SWAP_PART"
+mkfs.ext4 -F -L "ROOT" "$ROOT_PART"
+mkswap -L "SWAP" "$SWAP_PART"
 
 echo ""
 echo "---MOUNTING PARTITIONS---"
