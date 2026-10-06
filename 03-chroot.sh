@@ -106,7 +106,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 test -s /boot/vmlinuz-linux
 test -s /boot/initramfs-linux.img
 test -s /boot/grub/grub.cfg
-test -s /boot/efi/EFI/GRUB/grubx64.efi
+test -s /boot/efi/EFI/BOOT/BOOTX64.EFI
 
 grub-script-check /boot/grub/grub.cfg
 efibootmgr -v

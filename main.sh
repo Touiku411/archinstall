@@ -48,13 +48,12 @@ SWAP_UUID=$(blkid -s UUID -o value "$SWAP_PART")
     exit 1
 }
 
-arch-chroot /mnt /03-chroot.sh \
-    "$USERNAME" "$HOSTNAME" "$HAS_NVIDIA" "$CPU_VENDOR" "$SWAP_UUID" "$SWAP_UUID"
-
-
-cp ./03-chroot.sh /mnt
+cp ./03-chroot.sh /mnt/03-chroot.sh
 chmod +x /mnt/03-chroot.sh
-arch-chroot /mnt /03-chroot.sh "$USERNAME" "$HOSTNAME" "$HAS_NVIDIA" "$CPU_VENDOR"
+
+arch-chroot /mnt /03-chroot.sh \
+    "$USERNAME" "$HOSTNAME" "$HAS_NVIDIA" "$CPU_VENDOR" "$SWAP_UUID"
+
 rm /mnt/03-chroot.sh
 
 
