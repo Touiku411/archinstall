@@ -1,6 +1,7 @@
 #!/bin/bash
 #main
-set -e
+set -Eeuo pipefail
+trap 'printf "失敗：%s:%s：%s\n" "${BASH_SOURCE[0]}" "$LINENO" "$BASH_COMMAND" >&2' ERR
 
 #LOG_FILE="arch_install_$(date +%Y%m%d_%H%M%S).log"
 #exec > >(tee -a "$LOG_FILE") 2>&1
@@ -11,10 +12,15 @@ export HOSTNAME="archlinux"
 echo "=== Arch Linux Toukiu Script ==="
 
 if ! command -v mkfs.fat &> /dev/null; then
-    sudo pacman -Sy --noconfirm dosfstools
+    pacman -Sy --noconfirm dosfstools
 fi
 if ! command -v pacstrap &> /dev/null; then
-    sudo pacman -Sy --noconfirm arch-install-scripts
+    pacman -Sy --noconfirm arch-install-scripts
+fi
+
+if (( EUID != 0 )); then
+    echo "請使用 root 執行安裝腳本。" >&2
+    exit 1
 fi
 
 source ./01-disk.sh
@@ -36,6 +42,14 @@ else
     export CPU_VENDOR="UNKNOWN"
 fi
 
+SWAP_UUID=$(blkid -s UUID -o value "$SWAP_PART")
+[[ -n "$SWAP_UUID" ]] || {
+    echo "無法取得目標 swap UUID。" >&2
+    exit 1
+}
+
+arch-chroot /mnt /03-chroot.sh \
+    "$USERNAME" "$HOSTNAME" "$HAS_NVIDIA" "$CPU_VENDOR" "$SWAP_UUID" "$SWAP_UUID"
 
 
 cp ./03-chroot.sh /mnt

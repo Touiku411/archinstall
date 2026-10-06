@@ -1,5 +1,7 @@
 #!/bin/bash
 #02-base
+set -Eeuo pipefail
+trap 'printf "失敗：%s:%s：%s\n" "${BASH_SOURCE[0]}" "$LINENO" "$BASH_COMMAND" >&2' ERR
 echo ""
 echo "---FORMATING PARTITIONS---"
 
@@ -20,5 +22,8 @@ pacman -Sy --noconfirm reflector
 # -a : age, -c : country, -f : fast, --v : verbose show process
 reflector -a 12 -c tw -f 10 --sort rate --v --save /etc/pacman.d/mirrorlist
 
-pacstrap -i /mnt base linux linux-firmware vim grub efibootmgr --noconfirm
+pacstrap -K /mnt \
+    base linux linux-firmware mkinitcpio \
+    vim grub efibootmgr --noconfirm
+
 genfstab -U /mnt >> /mnt/etc/fstab

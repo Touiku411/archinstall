@@ -1,7 +1,7 @@
 #!/bin/bash
 #01-disk
-set -e
-set -o pipefail
+set -Eeuo pipefail
+trap 'printf "失敗：%s:%s：%s\n" "${BASH_SOURCE[0]}" "$LINENO" "$BASH_COMMAND" >&2' ERR
 
 echo ""
 echo "---detected disks---"

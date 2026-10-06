@@ -1,10 +1,15 @@
 #!/bin/bash
 #03-chroot
 
+set -Eeuo pipefail
+trap 'printf "失敗：%s:%s：%s\n" "${BASH_SOURCE[0]}" "$LINENO" "$BASH_COMMAND" >&2' ERR
+set -e
+
 USERNAME=$1
 HOSTNAME=$2
 HAS_NVIDIA=$3
 CPU_VENDOR=$4
+SWAP_UUID=$5
 
 PKGS_PACMAN=(
     "networkmanager" "sudo" "pipewire" "wireplumber" "pipewire-pulse" 
@@ -13,7 +18,12 @@ PKGS_PACMAN=(
     "fcitx5-gtk" "fcitx5-chinese-addons" "nautilus" "kitty" "os-prober" "pavucontrol" "fish"
 )
 if [[ "$HAS_NVIDIA" == "YES" ]]; then
-    PKGS_PACMAN+=("nvidia-utils" "nvidia-open-dkms" "nvidia-settings")
+    PKGS_PACMAN+=(
+        "linux-headers"
+        "nvidia-utils"
+        "nvidia-open-dkms"
+        "nvidia-settings"
+    )
 fi
 if [[ "$CPU_VENDOR" == "INTEL" ]]; then
     PKGS_PACMAN+=("intel-ucode")
@@ -52,7 +62,6 @@ echo "%wheel ALL=(ALL:ALL) ALL" >> /etc/sudoers
 
 #Hibernate
 echo "CONFIGURING HIBERNATE..."
-SWAP_UUID=$(blkid -s UUID -o value -t TYPE=swap)
 
 # 將 resume 參數寫入 GRUB (不需要 resume_offset 了！)
 if ! grep -q "resume=" /etc/default/grub; then
@@ -66,14 +75,16 @@ fi
 
 
 # bootloader grub
-grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi
-# grub-mkconfig -o /boot/grub/grub.cfg
+grub-install \
+    --target=x86_64-efi \
+    --bootloader-id=GRUB \
+    --efi-directory=/boot/efi \
+    --removable
 
 systemctl enable NetworkManager.service
 
 if [[ "$HAS_NVIDIA" == "YES" ]]; then
     sed -i 's/^MODULES=.*/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)/' /etc/mkinitcpio.conf
-    pacman -S --noconfirm linux-headers
     # mkinitcpio -P
     # \( .* \) .*表全部
     if ! grep -q "nvidia_drm.modeset=1" /etc/default/grub; then
@@ -92,15 +103,11 @@ fi
 mkinitcpio -P
 grub-mkconfig -o /boot/grub/grub.cfg
 
-read -p "install hyprland dotfiles ? [Y/n]" CONFIRM
-CONFIRM="${CONFIRM,,}"
-if [[ "$CONFIRM" == "y" || "$CONFIRM" == "yes" || -z "$CONFIRM" ]]; then
-    cd "/home/$USERNAME"
-    sudo -H -u "$USERNAME" bash <<'EOF'
-    git clone https://github.com/Touiku411/arch-hyprland.git "$HOME/arch-hyprland"
-    cd "$HOME/arch-hyprland" && chmod +x setup.sh
-    ./setup.sh
-EOF
-fi
+test -s /boot/vmlinuz-linux
+test -s /boot/initramfs-linux.img
+test -s /boot/grub/grub.cfg
+test -s /boot/efi/EFI/GRUB/grubx64.efi
 
+grub-script-check /boot/grub/grub.cfg
+efibootmgr -v
 
